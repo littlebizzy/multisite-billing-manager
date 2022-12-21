@@ -3,7 +3,7 @@
 Plugin Name: Multisite Billing Manager
 Plugin URI: https://www.littlebizzy.com/plugins/multisite-billing-manager
 Description: 
-Version: 0.0.1
+Version: 0.0.2
 Author: LittleBizzy
 Author URI: https://www.littlebizzy.com
 License: GPLv3
@@ -39,6 +39,20 @@ function multisite_billing_manager_page(){
         );
 }
 
+/*
+ * Some CSS tricks to hide the link to our custom submenu page
+ */
+add_action('admin_head','misha_trick');
+function misha_trick(){
+	
+	echo '<style>
+	#menu-site .wp-submenu li:last-child{
+		display:none;
+	}
+	</style>';
+	
+}
+
 function multisite_billing_manager_page_generate(){
 
         // do not worry about that, we will check it too
@@ -52,7 +66,7 @@ function multisite_billing_manager_page_generate(){
 
         
         echo '<div class="wrap"><h1 id="edit-site">' . $title . '</h1>
-        <p class="edit-site-actions"><a href="' . esc_url( get_home_url( $id, '/' ) ) . '">Visit</a> | <a href="' . esc_url( get_admin_url( $id ) ) . '">Da>
+	<p class="edit-site-actions"><a href="' . esc_url( get_home_url( $id, '/' ) ) . '">Visit</a> | <a href="' . esc_url( get_admin_url( $id ) ) . '">Dashboard</a></p>';
 
                 // navigation tabs
                 network_edit_site_nav( array(
@@ -75,9 +89,7 @@ function multisite_billing_manager_page_generate(){
 
                         echo '<input type="hidden" name="id" value="' . $id . '" />
                         <table class="form-table">
-                                
-
-        <tr>
+                            <tr>
                                         <th scope="row">Billing Plan</th>
 
 <td>
@@ -86,7 +98,6 @@ function multisite_billing_manager_page_generate(){
 <label><input type="radio" name="billing_plan" value="free"' . checked( 'free', $billplan, false ) . ' />Free</label><br />
 <label><input type="radio" name="billing_plan" value="basic"' . checked( 'basic', $billplan, false ) . ' />Basic</label><br />
 <label><input type="radio" name="billing_plan" value="premium"' . checked( 'premium', $billplan, false ) . ' />Premium</label><br />
-
 <fieldset>
 </td>
                     </tr>
@@ -119,40 +130,40 @@ function multisite_billing_manager_save_options() {
 add_action( 'network_admin_notices', 'multisite_billing_manager_notice_success' );
 function multisite_billing_manager_notice_success() {
 
-        if( isset( $_GET['updated'] ) && isset( $_GET['page'] ) && $_GET['page'] == 'billing' ) {
+        if( isset( $_GET['updated'] ) && isset( $_GET['page'] ) && $_GET['page'] == 'mishapage' ) {
 
-                echo '<div id="message" class="updated notice is-dismissible">
-                        <p>Congratulations!</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></b>
-                </div>';
+		echo '<div id="message" class="updated notice is-dismissible">
+			<p>Congratulations!</p><button type="button" class="notice-dismiss"><span class="screen-reader-text">Dismiss this notice.</span></button>
+		</div>';
 
-        }
+	}
 
 }
 
 add_action( 'current_screen', 'misha_redirects' );
 function misha_redirects(){
 
-        // do nothing if we are on another page
-        $screen = get_current_screen();
-        if( $screen->id !== 'sites_page_mishapage-network' ) {
-                return;
-        }
+	// do nothing if we are on another page
+	$screen = get_current_screen();
+	if( $screen->id !== 'sites_page_mishapage-network' ) {
+		return;
+	}
 
-        // $id is a blog ID
-        $id = isset( $_REQUEST['id'] ) ? intval( $_REQUEST['id'] ) : 0;
+	// $id is a blog ID
+	$id = isset( $_REQUEST['id'] ) ? intval( $_REQUEST['id'] ) : 0;
 
-        if ( ! $id ) {
-                wp_die( __('Invalid site ID.') );
-        }
+	if ( ! $id ) {
+		wp_die( __('Invalid site ID.') );
+	}
 
-        $details = get_site( $id );
-        if ( ! $details ) {
-                wp_die( __( 'The requested site does not exist.' ) );
-        }
+	$details = get_site( $id );
+	if ( ! $details ) {
+		wp_die( __( 'The requested site does not exist.' ) );
+	}
 
-        //if ( ! can_edit_network( $details->site_id ) ) {
-        //      wp_die( __( 'Sorry, you are not allowed to access this page.' ), 403 );
-        //}
+	//if ( ! can_edit_network( $details->site_id ) ) {
+	//	wp_die( __( 'Sorry, you are not allowed to access this page.' ), 403 );
+	//}
 
 }
 
