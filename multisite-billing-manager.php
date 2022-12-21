@@ -3,7 +3,7 @@
 Plugin Name: Multisite Billing Manager
 Plugin URI: https://www.littlebizzy.com/plugins/multisite-billing-manager
 Description: 
-Version: 0.0.0
+Version: 0.0.1
 Author: LittleBizzy
 Author URI: https://www.littlebizzy.com
 License: GPLv3
