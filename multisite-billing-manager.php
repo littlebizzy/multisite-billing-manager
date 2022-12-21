@@ -25,3 +25,16 @@ function multisite_billing_manager_tab( $tabs ){
         return $tabs;
 
 }
+
+add_action( 'network_admin_menu', 'multisite_billing_manager_page' );
+
+function multisite_billing_manager_page(){
+        add_submenu_page(
+                'sites.php',
+                'Edit website', // will be displayed in <title>
+                'Edit website', // doesn't matter
+                'manage_network_options', // capabilities
+                'billing',
+                'multisite_billing_manager_page_generate' // the name of the function which displays the page
+        );
+}
