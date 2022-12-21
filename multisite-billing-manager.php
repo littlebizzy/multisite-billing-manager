@@ -83,9 +83,9 @@ function multisite_billing_manager_page_generate(){
 <td>
 <fieldset>
 <legend class="screen-reader-text">Set billing plan</legend>
-<label><input type="radio" name="billing_plan" value="free"' . checked( 'free', $billplan ) . ' />Free</label><br />
-<label><input type="radio" name="billing_plan" value="basic"' . checked( 'basic', $billplan ) . ' />Basic</label><br />
-<label><input type="radio" name="billing_plan" value="premium"' . checked( 'premium', $billplan ) . ' />Premium</label><br />
+<label><input type="radio" name="billing_plan" value="free"' . checked( 'free', $billplan, false ) . ' />Free</label><br />
+<label><input type="radio" name="billing_plan" value="basic"' . checked( 'basic', $billplan, false ) . ' />Basic</label><br />
+<label><input type="radio" name="billing_plan" value="premium"' . checked( 'premium', $billplan, false ) . ' />Premium</label><br />
 
 <fieldset>
 </td>
@@ -155,3 +155,5 @@ function misha_redirects(){
         //}
 
 }
+
+// https://stackoverflow.com/questions/44015298/wordpress-checked-checked-syntax
