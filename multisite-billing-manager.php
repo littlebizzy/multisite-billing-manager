@@ -46,6 +46,9 @@ function multisite_billing_manager_page_generate(){
 
         // you can use $details = get_site( $id ) to add website specific detailes to the title
         $title = 'Edit site: ';
+    
+        // must be blog (child site) specific
+        $billplan = get_blog_option( $id, 'billing_plan' );
 
         
         echo '<div class="wrap"><h1 id="edit-site">' . $title . '</h1>
@@ -69,10 +72,7 @@ function multisite_billing_manager_page_generate(){
                 </style>
                 <form method="post" action="edit.php?action=billingupdate">';
                         wp_nonce_field( 'billing-check' . $id );
-                        
-$blog_id = $id;
-$billplan = get_blog_option( $blog_id, 'billing_plan' );
-echo $billplan;
+
                         echo '<input type="hidden" name="id" value="' . $id . '" />
                         <table class="form-table">
                                 
@@ -85,7 +85,7 @@ echo $billplan;
 <legend class="screen-reader-text">Set billing plan</legend>
 <label><input type="radio" name="billing_plan" value="free"' . checked( 'free', $billplan ) . ' />Free</label><br />
 <label><input type="radio" name="billing_plan" value="basic"' . checked( 'basic', $billplan ) . ' />Basic</label><br />
-<label><input type="radio" name="billing_plan" value="premium"' . checked( $billplan, 'premium' ) . ' />Premium</label><br />
+<label><input type="radio" name="billing_plan" value="premium"' . checked( 'premium', $billplan ) . ' />Premium</label><br />
 
 <fieldset>
 </td>
