@@ -3,7 +3,7 @@
 Plugin Name: Multisite Billing Manager
 Plugin URI: https://www.littlebizzy.com/plugins/multisite-billing-manager
 Description: Billing for Multisite networks
-Version: 1.0.0
+Version: 1.1.0
 Author: LittleBizzy
 Author URI: https://www.littlebizzy.com
 License: GPLv3
@@ -98,6 +98,7 @@ function multisite_billing_manager_page_generate(){
 <label><input type="radio" name="billing_plan" value="free"' . checked( 'free', $billplan, false ) . ' />Free</label><br />
 <label><input type="radio" name="billing_plan" value="basic"' . checked( 'basic', $billplan, false ) . ' />Basic</label><br />
 <label><input type="radio" name="billing_plan" value="premium"' . checked( 'premium', $billplan, false ) . ' />Premium</label><br />
+<label><input type="radio" name="billing_plan" value="vip"' . checked( 'vip', $billplan, false ) . ' />VIP</label>
 <fieldset>
 </td>
                     </tr>
