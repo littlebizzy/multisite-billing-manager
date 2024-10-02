@@ -79,7 +79,7 @@ function multisite_billing_manager_page_generate() {
     ) );
 
     // Display the form for editing the billing plan
-    echo '<form method="post" action="' . esc_url( admin_url( 'edit.php?action=billingupdate' ) ) . '">';
+    echo '<form method="post" action="' . esc_url( network_admin_url( 'edit.php?action=billingupdate' ) ) . '">';
     wp_nonce_field( 'billing-check' . $id );
     echo '<input type="hidden" name="id" value="' . esc_attr( $id ) . '" />
         <table class="form-table">
