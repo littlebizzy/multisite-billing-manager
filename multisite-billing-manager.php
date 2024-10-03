@@ -174,9 +174,20 @@ function multisite_billing_manager_child_site_page() {
     $blog_id = get_current_blog_id();
     $billplan = get_blog_option( $blog_id, 'billing_plan', 'free' ); // Default to 'free' if not set
 
+    // Map the billing plan values to their display labels
+    $plan_labels = array(
+        'free'    => 'Free',
+        'basic'   => 'Basic',
+        'premium' => 'Premium',
+        'vip'     => 'VIP'
+    );
+
+    // Get the label for the current billing plan
+    $plan_label = isset( $plan_labels[$billplan] ) ? $plan_labels[$billplan] : 'Free';
+
     echo '<div class="wrap">
-        <h1>' . esc_html__( 'Your Current Billing Plan', 'multisite-billing-manager' ) . '</h1>
-        <p>' . esc_html__( 'Your site is currently on the ', 'multisite-billing-manager' ) . '<strong>' . esc_html( ucfirst( $billplan ) ) . '</strong> ' . esc_html__( 'plan.', 'multisite-billing-manager' ) . '</p>
+        <h1>' . esc_html__( 'Billing Plan', 'multisite-billing-manager' ) . '</h1>
+        <p>' . esc_html__( 'Your site is currently on the ', 'multisite-billing-manager' ) . '<strong>' . esc_html( $plan_label ) . '</strong> ' . esc_html__( 'plan and includes associated features.', 'multisite-billing-manager' ) . '</p>
     </div>';
 }
 
