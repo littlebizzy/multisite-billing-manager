@@ -4,6 +4,11 @@ Billing for Multisite networks
 
 ## Changelog
 
+### 1.2.1
+- fixed Billing tab link in Edit Site (Network Admin) interface
+- adding basic Billing setting page for child sites under `/wp-admin/index.php?page=billing`
+- standardized billing plan labels for consistency
+
 ### 1.2.0
 - improved security with sanitization, nonces, escapes, etc.
 - better handling of site IDs
