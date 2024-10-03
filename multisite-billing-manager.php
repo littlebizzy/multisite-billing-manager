@@ -3,7 +3,7 @@
 Plugin Name: Multisite Billing Manager
 Plugin URI: https://www.littlebizzy.com/plugins/multisite-billing-manager
 Description: Billing for Multisite networks
-Version: 1.2.0
+Version: 1.2.1
 Author: LittleBizzy
 Author URI: https://www.littlebizzy.com
 License: GPLv3
@@ -26,9 +26,10 @@ add_filter( 'gu_override_dot_org', function( $overrides ) {
 // Add custom "Billing" tab to the site edit screen in the Network Admin
 add_filter( 'network_edit_site_nav_links', 'multisite_billing_manager_tab' );
 function multisite_billing_manager_tab( $tabs ) {
+    $site_id = isset( $_REQUEST['id'] ) ? intval( $_REQUEST['id'] ) : 0;
     $tabs['billing'] = array(
         'label' => esc_html__( 'Billing', 'multisite-billing-manager' ),
-        'url'   => esc_url( network_admin_url( 'sites.php?page=billing' ) ),
+        'url'   => 'sites.php?page=billing&id=' . $site_id, // Reverted to the working version from 1.1.0
         'cap'   => 'manage_sites' // Only users with 'manage_sites' capability can see the tab
     );
     return $tabs;
@@ -153,6 +154,30 @@ function multisite_billing_manager_redirects() {
     if ( ! $details ) {
         wp_die( esc_html__( 'The requested site does not exist.', 'multisite-billing-manager' ) );
     }
+}
+
+// Add a billing page for child sites to view their current billing level under the Dashboard menu
+add_action( 'admin_menu', 'multisite_billing_manager_child_site_menu' );
+function multisite_billing_manager_child_site_menu() {
+    add_submenu_page(
+        'index.php', // Parent menu slug (Dashboard)
+        esc_html__( 'Billing', 'multisite-billing-manager' ), // Page title
+        esc_html__( 'Billing', 'multisite-billing-manager' ), // Menu title
+        'read', // Capability required to access
+        'billing', // Menu slug
+        'multisite_billing_manager_child_site_page' // Function to display the page content
+    );
+}
+
+// Display the billing level on the child site's billing page
+function multisite_billing_manager_child_site_page() {
+    $blog_id = get_current_blog_id();
+    $billplan = get_blog_option( $blog_id, 'billing_plan', 'free' ); // Default to 'free' if not set
+
+    echo '<div class="wrap">
+        <h1>' . esc_html__( 'Your Current Billing Plan', 'multisite-billing-manager' ) . '</h1>
+        <p>' . esc_html__( 'Your site is currently on the ', 'multisite-billing-manager' ) . '<strong>' . esc_html( ucfirst( $billplan ) ) . '</strong> ' . esc_html__( 'plan.', 'multisite-billing-manager' ) . '</p>
+    </div>';
 }
 
 // Ref: ChatGPT
