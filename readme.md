@@ -4,6 +4,9 @@ Billing for Multisite networks
 
 ## Changelog
 
+### 1.2.2
+- added `Requires PHP` plugin header
+
 ### 1.2.1
 - fixed Billing tab link in Edit Site (Network Admin) interface
 - adding basic Billing setting page for child sites under `/wp-admin/index.php?page=billing`
