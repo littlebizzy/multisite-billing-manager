@@ -3,14 +3,17 @@
 Plugin Name: Multisite Billing Manager
 Plugin URI: https://www.littlebizzy.com/plugins/multisite-billing-manager
 Description: Billing for Multisite networks
-Version: 1.2.2
+Version: 1.2.3
 Requires PHP: 7.0
+Tested up to: 6.7
 Author: LittleBizzy
 Author URI: https://www.littlebizzy.com
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
+Update URI: false
 GitHub Plugin URI: littlebizzy/multisite-billing-manager
-Primary Branch: main
+Primary Branch: master
+Text Domain: multisite-billing-manager
 */
 
 // prevent direct access
@@ -18,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-// disable wordpress.org updates for this plugin
+// override wordpress.org with git updater
 add_filter( 'gu_override_dot_org', function( $overrides ) {
     $overrides[] = 'multisite-billing-manager/multisite-billing-manager.php';
     return $overrides;
