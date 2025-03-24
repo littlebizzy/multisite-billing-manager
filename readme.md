@@ -4,6 +4,15 @@ Billing for Multisite networks
 
 ## Changelog
 
+### 1.2.3
+- adjusted CSS selector to more reliably hide billing submenu
+- replaced one use of `$_REQUEST` with `$_GET` for clarity
+- removed one ternary operator for consistency
+- added `Tested up to` plugin header
+- added `Update URI` plugin header
+- added `Text Domain` plugin header
+- changed default GitHub branch to `master` not `main`
+
 ### 1.2.2
 - added `Requires PHP` plugin header
 
