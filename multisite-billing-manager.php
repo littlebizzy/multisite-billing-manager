@@ -27,65 +27,74 @@ add_filter( 'gu_override_dot_org', function( $overrides ) {
     return $overrides;
 }, 999 );
 
-// Add custom "Billing" tab to the site edit screen in the Network Admin
+// add billing tab to site edit screen in network admin
 add_filter( 'network_edit_site_nav_links', 'multisite_billing_manager_tab' );
 function multisite_billing_manager_tab( $tabs ) {
-    $site_id = isset( $_REQUEST['id'] ) ? intval( $_REQUEST['id'] ) : 0;
+    $site_id = 0;
+    if ( isset( $_GET['id'] ) ) {
+        $site_id = intval( $_GET['id'] );
+    }
+
     $tabs['billing'] = array(
         'label' => esc_html__( 'Billing', 'multisite-billing-manager' ),
-        'url'   => 'sites.php?page=billing&id=' . $site_id, // Reverted to the working version from 1.1.0
-        'cap'   => 'manage_sites' // Only users with 'manage_sites' capability can see the tab
+        'url'   => 'sites.php?page=billing&id=' . $site_id,
+        'cap'   => 'manage_sites'
     );
+
     return $tabs;
 }
 
-// Add "Billing" submenu page under "Sites" in the Network Admin
+// add billing submenu under sites in network admin
 add_action( 'network_admin_menu', 'multisite_billing_manager_page' );
 function multisite_billing_manager_page() {
     add_submenu_page(
         'sites.php',
         esc_html__( 'Edit Website', 'multisite-billing-manager' ),
         esc_html__( 'Edit Website', 'multisite-billing-manager' ),
-        'manage_network_options', // Required capability to access the page
+        'manage_network_options',
         'billing',
         'multisite_billing_manager_page_generate'
     );
 }
 
-// Hide the submenu link in the Network Admin UI
+// hide billing submenu link in network admin
 add_action( 'admin_head', 'multisite_billing_manager_css_trick' );
 function multisite_billing_manager_css_trick() {
     echo '<style>
-        #menu-site .wp-submenu li:last-child {
+        body.network-admin #menu-site .wp-submenu a[href*="page=billing"] {
             display: none;
         }
     </style>';
 }
 
-// Display the custom "Billing" page for the site in the Network Admin
+// display billing page in network admin
 function multisite_billing_manager_page_generate() {
-    if ( ! isset( $_REQUEST['id'] ) || ! intval( $_REQUEST['id'] ) ) {
+    if ( ! isset( $_GET['id'] ) || ! intval( $_GET['id'] ) ) {
         wp_die( esc_html__( 'Invalid site ID.', 'multisite-billing-manager' ) );
     }
 
-    $id = intval( $_REQUEST['id'] );
-    $billplan = get_blog_option( $id, 'billing_plan' ); // Retrieve the current billing plan
+    $id = intval( $_GET['id'] );
+    $billplan = get_blog_option( $id, 'billing_plan' );
 
     $title = esc_html__( 'Edit site: ', 'multisite-billing-manager' );
+
     echo '<div class="wrap">
         <h1 id="edit-site">' . $title . '</h1>
-        <p class="edit-site-actions"><a href="' . esc_url( get_home_url( $id, '/' ) ) . '">' . esc_html__( 'Visit', 'multisite-billing-manager' ) . '</a> | 
-        <a href="' . esc_url( get_admin_url( $id ) ) . '">' . esc_html__( 'Dashboard', 'multisite-billing-manager' ) . '</a></p>';
+        <p class="edit-site-actions">
+            <a href="' . esc_url( get_home_url( $id, '/' ) ) . '">' . esc_html__( 'Visit', 'multisite-billing-manager' ) . '</a> | 
+            <a href="' . esc_url( get_admin_url( $id ) ) . '">' . esc_html__( 'Dashboard', 'multisite-billing-manager' ) . '</a>
+        </p>';
 
-    // Display the tab navigation
+    // show navigation tabs
     network_edit_site_nav( array(
         'blog_id'  => $id,
-        'selected' => 'billing' // Highlight the "Billing" tab
+        'selected' => 'billing'
     ) );
 
-    // Display the form for editing the billing plan
+    // show billing form
     echo '<form method="post" action="' . esc_url( network_admin_url( 'edit.php?action=billingupdate' ) ) . '">';
     wp_nonce_field( 'billing-check' . $id );
+
     echo '<input type="hidden" name="id" value="' . esc_attr( $id ) . '" />
         <table class="form-table">
             <tr>
@@ -101,11 +110,12 @@ function multisite_billing_manager_page_generate() {
                 </td>
             </tr>
         </table>';
-    submit_button(); // Standard WordPress submit button
+
+    submit_button();
     echo '</form></div>';
 }
 
-// Handle form submission and update the billing plan
+// handle billing form submission in network admin
 add_action( 'network_admin_edit_billingupdate', 'multisite_billing_manager_save_options' );
 function multisite_billing_manager_save_options() {
     if ( ! isset( $_POST['id'] ) || ! intval( $_POST['id'] ) ) {
@@ -113,46 +123,53 @@ function multisite_billing_manager_save_options() {
     }
 
     $blog_id = intval( $_POST['id'] );
-    check_admin_referer( 'billing-check' . $blog_id ); // Security check
 
+    // verify nonce
+    check_admin_referer( 'billing-check' . $blog_id );
+
+    // save billing plan if set
     if ( isset( $_POST['billing_plan'] ) ) {
-        $billing_plan = sanitize_text_field( $_POST['billing_plan'] ); // Sanitize input
-        update_blog_option( $blog_id, 'billing_plan', $billing_plan ); // Update billing plan
+        $billing_plan = sanitize_text_field( $_POST['billing_plan'] );
+        update_blog_option( $blog_id, 'billing_plan', $billing_plan );
     }
 
-    // Redirect back to the "Billing" page with a success message
+    // redirect with success flag
     wp_safe_redirect( add_query_arg( array(
         'page'    => 'billing',
         'id'      => $blog_id,
-        'updated' => 'true',
+        'updated' => 'true'
     ), network_admin_url( 'sites.php' ) ) );
+
     exit;
 }
 
-// Display success notice after saving the billing plan
+// show success notice after saving billing plan
 add_action( 'network_admin_notices', 'multisite_billing_manager_notice_success' );
 function multisite_billing_manager_notice_success() {
     if ( isset( $_GET['updated'], $_GET['page'] ) && $_GET['page'] === 'billing' ) {
         echo '<div id="message" class="updated notice is-dismissible">
             <p>' . esc_html__( 'Settings saved successfully!', 'multisite-billing-manager' ) . '</p>
-            <button type="button" class="notice-dismiss"><span class="screen-reader-text">' . esc_html__( 'Dismiss this notice.', 'multisite-billing-manager' ) . '</span></button>
+            <button type="button" class="notice-dismiss">
+                <span class="screen-reader-text">' . esc_html__( 'Dismiss this notice.', 'multisite-billing-manager' ) . '</span>
+            </button>
         </div>';
     }
 }
 
-// Redirect to the "Billing" page with proper validation
+// validate site id before showing billing page
 add_action( 'current_screen', 'multisite_billing_manager_redirects' );
 function multisite_billing_manager_redirects() {
     $screen = get_current_screen();
+
     if ( $screen->id !== 'sites_page_billing-network' ) {
         return;
     }
 
-    if ( ! isset( $_REQUEST['id'] ) || ! intval( $_REQUEST['id'] ) ) {
+    if ( ! isset( $_GET['id'] ) || ! intval( $_GET['id'] ) ) {
         wp_die( esc_html__( 'Invalid site ID.', 'multisite-billing-manager' ) );
     }
 
-    $id = intval( $_REQUEST['id'] );
+    $id = intval( $_GET['id'] );
     $details = get_site( $id );
 
     if ( ! $details ) {
@@ -160,25 +177,25 @@ function multisite_billing_manager_redirects() {
     }
 }
 
-// Add a billing page for child sites to view their current billing level under the Dashboard menu
+// add billing page under dashboard for child sites
 add_action( 'admin_menu', 'multisite_billing_manager_child_site_menu' );
 function multisite_billing_manager_child_site_menu() {
     add_submenu_page(
-        'index.php', // Parent menu slug (Dashboard)
-        esc_html__( 'Billing', 'multisite-billing-manager' ), // Page title
-        esc_html__( 'Billing', 'multisite-billing-manager' ), // Menu title
-        'read', // Capability required to access
-        'billing', // Menu slug
-        'multisite_billing_manager_child_site_page' // Function to display the page content
+        'index.php',
+        esc_html__( 'Billing', 'multisite-billing-manager' ),
+        esc_html__( 'Billing', 'multisite-billing-manager' ),
+        'read',
+        'billing',
+        'multisite_billing_manager_child_site_page'
     );
 }
 
-// Display the billing level on the child site's billing page
+// show billing level on child site billing page
 function multisite_billing_manager_child_site_page() {
     $blog_id = get_current_blog_id();
-    $billplan = get_blog_option( $blog_id, 'billing_plan', 'free' ); // Default to 'free' if not set
+    $billplan = get_blog_option( $blog_id, 'billing_plan', 'free' );
 
-    // Map the billing plan values to their display labels
+    // define plan labels
     $plan_labels = array(
         'free'    => 'Free',
         'basic'   => 'Basic',
@@ -186,8 +203,11 @@ function multisite_billing_manager_child_site_page() {
         'vip'     => 'VIP'
     );
 
-    // Get the label for the current billing plan
-    $plan_label = isset( $plan_labels[$billplan] ) ? $plan_labels[$billplan] : 'Free';
+    // get label for current plan
+    $plan_label = 'Free';
+    if ( isset( $plan_labels[$billplan] ) ) {
+        $plan_label = $plan_labels[$billplan];
+    }
 
     echo '<div class="wrap">
         <h1>' . esc_html__( 'Billing Plan', 'multisite-billing-manager' ) . '</h1>
